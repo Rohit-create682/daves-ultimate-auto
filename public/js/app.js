@@ -473,8 +473,8 @@
     const body = {
       location_id: parseInt(currentBooking.locationId, 10),
       service_id: parseInt(currentBooking.serviceId, 10),
-      appointment_date: modalDate.value,
-      appointment_time: modalTime.value,
+      date: modalDate.value,
+      time: modalTime.value,
       first_name: $('#modalFirstName').value.trim(),
       last_name: $('#modalLastName').value.trim(),
       email: $('#modalEmail').value.trim(),
@@ -498,7 +498,6 @@
 
       const result = await res.json();
       closeBookingModal();
-      showConfirmationDialog(body, result);
       showToast('Appointment scheduled successfully!', 'success');
     } catch (err) {
       console.error('Booking error:', err);
