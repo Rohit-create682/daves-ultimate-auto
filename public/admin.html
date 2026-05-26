@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Dave's Ultimate Automotive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- ============ LOGIN SCREEN ============ -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">⚙️</div>
+      <h1 class="login-title">Dave's Ultimate Automotive</h1>
+      <p class="login-subtitle">Admin Dashboard</p>
+
+      <form id="login-form" class="login-form" autocomplete="on">
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" name="username" placeholder="Enter username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+        </div>
+        <div id="login-error" class="login-error" hidden></div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-spinner" hidden>
+            <span class="spinner spinner-sm"></span>
+          </span>
+        </button>
+      </form>
+
+      <p class="login-hint">Demo: <strong>admin</strong> / <strong>changeme123</strong></p>
+    </div>
+  </div>
+
+  <!-- ============ DASHBOARD LAYOUT ============ -->
+  <div id="dashboard-layout" class="dashboard-layout" hidden>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">⚙️</span>
+        <span class="sidebar-brand">Dave's Ultimate</span>
+        <button id="sidebar-close" class="sidebar-close" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-view="appointments">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Appointments</span>
+        </a>
+        <a href="#" class="nav-item" data-view="customers">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Customers</span>
+        </a>
+        <a href="#" class="nav-item" data-view="messages">
+          <span class="nav-icon">✉️</span>
+          <span class="nav-label">Messages</span>
+          <span id="unread-badge" class="nav-badge" hidden>0</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div class="user-details">
+            <span class="user-name" id="user-display-name">Admin</span>
+            <span class="user-role" id="user-display-role">Administrator</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="btn btn-logout">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Top header bar -->
+      <header class="top-bar">
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <h2 class="page-title" id="page-title">Dashboard</h2>
+      </header>
+
+      <!-- ===== DASHBOARD VIEW ===== -->
+      <section id="view-dashboard" class="view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">📅</div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-today-appointments">—</span>
+              <span class="stat-label">Today's Appointments</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-yellow">⏳</div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-pending-requests">—</span>
+              <span class="stat-label">Pending Requests</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">👥</div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-total-customers">—</span>
+              <span class="stat-label">Total Customers</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-red">✉️</div>
+            <div class="stat-content">
+              <span class="stat-number" id="stat-unread-messages">—</span>
+              <span class="stat-label">Unread Messages</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3>Today's Appointments</h3>
+          </div>
+          <div id="today-appointments-list" class="card-body">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading appointments…</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3>Recent Activity</h3>
+          </div>
+          <div id="recent-activity" class="card-body">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Loading activity…</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== APPOINTMENTS VIEW ===== -->
+      <section id="view-appointments" class="view" hidden>
+        <div class="view-header">
+          <h3>Appointments</h3>
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label for="filter-location">Location</label>
+              <select id="filter-location" class="input-select">
+                <option value="All Locations">All Locations</option>
+                <option value="Cedar Park">Cedar Park</option>
+                <option value="Central Austin">Central Austin</option>
+                <option value="Leander">Leander</option>
+                <option value="North Austin">North Austin</option>
+                <option value="Pflugerville">Pflugerville</option>
+                <option value="Round Rock">Round Rock</option>
+                <option value="South Austin">South Austin</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-status">Status</label>
+              <select id="filter-status" class="input-select">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-date">Date</label>
+              <input type="date" id="filter-date" class="input-date">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="appointments-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date &amp; Time</th>
+                <th>Customer</th>
+                <th>Location</th>
+                <th>Service</th>
+                <th>Vehicle</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appointments-tbody">
+              <tr>
+                <td colspan="7">
+                  <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading appointments…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== CUSTOMERS VIEW ===== -->
+      <section id="view-customers" class="view" hidden>
+        <div class="view-header">
+          <h3>Customers</h3>
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="customer-search" class="input-search" placeholder="Search by name, email, or phone…">
+          </div>
+        </div>
+
+        <!-- Customer List -->
+        <div id="customers-list-panel">
+          <div class="table-wrapper">
+            <table class="data-table" id="customers-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Vehicle</th>
+                  <th>Visits</th>
+                  <th>Last Visit</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customers-tbody">
+                <tr>
+                  <td colspan="7">
+                    <div class="loading-state">
+                      <div class="spinner"></div>
+                      <p>Loading customers…</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Customer Detail Panel -->
+        <div id="customer-detail-panel" class="detail-panel" hidden>
+          <button id="customer-back-btn" class="btn btn-ghost">
+            ← Back to Customers
+          </button>
+          <div class="detail-card">
+            <div class="detail-header">
+              <div class="detail-avatar" id="detail-customer-avatar">J</div>
+              <div class="detail-info">
+                <h3 id="detail-customer-name">—</h3>
+                <p id="detail-customer-email">—</p>
+                <p id="detail-customer-phone">—</p>
+              </div>
+            </div>
+            <div class="detail-meta">
+              <div class="meta-item">
+                <span class="meta-label">Vehicle</span>
+                <span class="meta-value" id="detail-customer-vehicle">—</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Total Visits</span>
+                <span class="meta-value" id="detail-customer-visits">—</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Last Visit</span>
+                <span class="meta-value" id="detail-customer-last-visit">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header">
+              <h3>Appointment History</h3>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="customer-history-tbody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MESSAGES VIEW ===== -->
+      <section id="view-messages" class="view" hidden>
+        <div class="view-header">
+          <h3>Messages</h3>
+        </div>
+
+        <div id="messages-list" class="messages-list">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading messages…</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ RESCHEDULE DIALOG ============ -->
+  <dialog id="reschedule-dialog" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Reschedule Appointment</h3>
+        <button class="modal-close" id="reschedule-close" aria-label="Close">✕</button>
+      </div>
+      <form id="reschedule-form" class="modal-body">
+        <input type="hidden" id="reschedule-appointment-id">
+        <div class="form-group">
+          <label for="reschedule-date">New Date</label>
+          <input type="date" id="reschedule-date" class="input-date" required>
+        </div>
+        <div class="form-group">
+          <label for="reschedule-time">New Time</label>
+          <select id="reschedule-time" class="input-select" required>
+            <option value="">Select a date first…</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="reschedule-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="reschedule-save">
+            <span class="btn-text">Save Changes</span>
+            <span class="btn-spinner" hidden><span class="spinner spinner-sm"></span></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ============ CONFIRM DIALOG ============ -->
+  <dialog id="confirm-dialog" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="confirm-title">Confirm Action</h3>
+        <button class="modal-close" id="confirm-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="confirm-cancel-btn">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ TOAST CONTAINER ============ -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
